@@ -2,7 +2,10 @@ module github.com/interfacerproject/zenflows-bank
 
 go 1.19
 
-require github.com/tarantool/go-tarantool v1.10.0
+require (
+	github.com/dyne/Zenroom/bindings/golang/zenroom v0.0.0-20230315091033-32dc01482086
+	github.com/tarantool/go-tarantool v1.10.0
+)
 
 require (
 	github.com/golang/protobuf v1.3.1 // indirect
