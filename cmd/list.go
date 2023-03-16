@@ -10,7 +10,6 @@ import (
 	"os"
 )
 
-var outputFile string
 
 func RequestPerson(id string, za zenflows.Agent, rc chan []string) {
 	person, err := za.GetPerson(id)
@@ -25,14 +24,13 @@ func RequestPerson(id string, za zenflows.Agent, rc chan []string) {
 
 func init() {
 	rootCmd.AddCommand(listCmd)
-	rootCmd.PersistentFlags().StringVar(&outputFile, "output", "list.csv", "output file, supported format are csv and xlsx. Defaults to list.csv")
 }
 
 var listCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List accounts and their token amount",
 	Run: func(cmd *cobra.Command, args []string) {
-		var balancesArray storage.Tokens
+		balancesIO := storage.TokensFile{FileName: outputFile}
 		storage := &storage.TTStorage{}
 		err := storage.Init(config.Config.TTHost, config.Config.TTUser, config.Config.TTPass)
 		if err != nil {
@@ -58,9 +56,9 @@ var listCmd = &cobra.Command{
 			if len(val) > 1 {
 				balances[val[0]].EthereumAddress = val[1]
 			}
-			balancesArray = append(balancesArray, balances[val[0]])
+			balancesIO.Tokens = append(balancesIO.Tokens, balances[val[0]])
 		}
-		balancesArray.Export(outputFile)
+		balancesIO.Export()
 		fmt.Printf("File written correctly to %s\n", outputFile)
 	},
 }

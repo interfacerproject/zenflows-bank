@@ -17,35 +17,32 @@
 package storage
 
 import (
-	"encoding/csv"
-	"io"
-	"log"
-	"os"
 	"path/filepath"
-	"strconv"
 )
 
-type Token struct {
-	Id              string
+type Fabcoin struct {
 	EthereumAddress string
 	Idea            int64
 	Strengths       int64
+	Fabcoin       int64
+	TxId       string
 }
 
-type TokensFile struct {
-	Tokens   []*Token
+type FabcoinFile struct {
+	Fabcoins   []*Fabcoin
 	FileName string
 }
 
-func (m TokensFile) IterateRows() <-chan []interface{} {
+func (m FabcoinFile) IterateRows() <-chan []interface{} {
 	c := make(chan []interface{})
 	go func() {
-		for _, v := range m.Tokens {
+		for _, v := range m.Fabcoins {
 			c <- []interface{}{
-				v.Id,
 				v.EthereumAddress,
 				v.Idea,
 				v.Strengths,
+				v.Fabcoin,
+				v.TxId,
 			}
 		}
 		close(c)
@@ -53,24 +50,25 @@ func (m TokensFile) IterateRows() <-chan []interface{} {
 	return c
 }
 
-func (ts TokensFile) Header() []interface{} {
+func (ts FabcoinFile) Header() []interface{} {
 	return []interface{}{
-		"ID",
 		"EthereumAddress",
 		"Idea",
 		"Strengths",
+		"Fabcoin",
+		"TxId",
 	}
 }
 
-func (ts TokensFile) ExportCSV() {
+func (ts FabcoinFile) ExportCSV() {
 	ExportCSV(ts.FileName, ts)
 }
 
-func (ts TokensFile) ExportXLS() {
+func (ts FabcoinFile) ExportXLS() {
 	ExportXLS(ts.FileName, ts, "Balances")
 }
 
-func (ts TokensFile) Export() {
+func (ts FabcoinFile) Export() {
 	ext := filepath.Ext(ts.FileName)
 	switch ext {
 	case ".csv":
@@ -82,54 +80,3 @@ func (ts TokensFile) Export() {
 	}
 }
 
-func (ts *TokensFile) ImportCSV() {
-	f, err := os.Open(ts.FileName)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	defer f.Close()
-
-	csvReader := csv.NewReader(f)
-
-	// Remove header
-	_, err = csvReader.Read()
-	if err == io.EOF {
-		return
-	}
-	for {
-		rec, err := csvReader.Read()
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			log.Fatal(err)
-		}
-		idea, err := strconv.ParseInt(rec[2], 10, 64)
-		if err != nil {
-			log.Fatal(err)
-		}
-		strengths, err := strconv.ParseInt(rec[3], 10, 64)
-		if err != nil {
-			log.Fatal(err)
-		}
-		ts.Tokens = append(ts.Tokens,
-			&Token{
-				Id:              rec[0],
-				EthereumAddress: rec[1],
-				Idea:            idea,
-				Strengths:       strengths,
-			},
-		)
-	}
-}
-
-func (ts *TokensFile) Import() {
-	ext := filepath.Ext(ts.FileName)
-	switch ext {
-	case ".csv":
-		ts.ImportCSV()
-	default:
-		panic("Unsupported extension " + ext)
-	}
-}

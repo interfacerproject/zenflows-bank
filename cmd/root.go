@@ -8,8 +8,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var inputFile string
+var outputFile string
+
 func init() {
 	cobra.OnInitialize(config.Init)
+	rootCmd.PersistentFlags().StringVar(&inputFile, "input", "list.csv", "input file, supported format is csv. Defaults to list.csv")
+	rootCmd.PersistentFlags().StringVar(&outputFile, "output", "list.csv", "output file, supported format are csv and xlsx. Defaults to list.csv")
 }
 
 var rootCmd = &cobra.Command{
