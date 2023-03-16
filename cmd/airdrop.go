@@ -2,21 +2,20 @@ package cmd
 
 import (
 	"context"
-    "crypto/ecdsa"
-	"log"
+	"crypto/ecdsa"
 	"fmt"
 	"github.com/interfacerproject/zenflows-bank/config"
-	"github.com/interfacerproject/zenflows-bank/storage"
 	"github.com/interfacerproject/zenflows-bank/fabcoin"
+	"github.com/interfacerproject/zenflows-bank/storage"
 	"github.com/spf13/cobra"
+	"log"
 	"math/big"
 
-    "github.com/ethereum/go-ethereum/accounts/abi/bind"
-    "github.com/ethereum/go-ethereum/common"
-    "github.com/ethereum/go-ethereum/crypto"
-    "github.com/ethereum/go-ethereum/ethclient"
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/ethclient"
 )
-
 
 var minIdea int64
 var minStrengths int64
@@ -114,10 +113,10 @@ var airdropCmd = &cobra.Command{
 			fabcoinsReceipt.Fabcoins = append(fabcoinsReceipt.Fabcoins,
 				&storage.Fabcoin{
 					EthereumAddress: v.EthereumAddress,
-					Idea: v.Idea,
-					Strengths: v.Strengths,
-					Fabcoin: fabcoin,
-					TxId: txid,
+					Idea:            v.Idea,
+					Strengths:       v.Strengths,
+					Fabcoin:         fabcoin,
+					TxId:            txid,
 				},
 			)
 		}

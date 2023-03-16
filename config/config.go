@@ -12,8 +12,8 @@ type EnvConfig struct {
 	TTUser       string `mapstructure:"TT_USER"`
 	TTPass       string `mapstructure:"TT_PASS"`
 	Fabcoin      string `mapstructure:"FABCOIN"`
-	EthereumUrl      string `mapstructure:"ETHEREUM_URL"`
-	EthereumSk      string `mapstructure:"ETHEREUM_SK"`
+	EthereumUrl  string `mapstructure:"ETHEREUM_URL"`
+	EthereumSk   string `mapstructure:"ETHEREUM_SK"`
 }
 
 var Config *EnvConfig

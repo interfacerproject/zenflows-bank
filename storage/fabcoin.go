@@ -24,12 +24,12 @@ type Fabcoin struct {
 	EthereumAddress string
 	Idea            int64
 	Strengths       int64
-	Fabcoin       int64
-	TxId       string
+	Fabcoin         int64
+	TxId            string
 }
 
 type FabcoinFile struct {
-	Fabcoins   []*Fabcoin
+	Fabcoins []*Fabcoin
 	FileName string
 }
 
@@ -79,4 +79,3 @@ func (ts FabcoinFile) Export() {
 		panic("Unsupported extension " + ext)
 	}
 }
-

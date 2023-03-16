@@ -10,7 +10,6 @@ import (
 	"os"
 )
 
-
 func RequestPerson(id string, za zenflows.Agent, rc chan []string) {
 	person, err := za.GetPerson(id)
 
