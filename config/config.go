@@ -11,6 +11,7 @@ type EnvConfig struct {
 	TTHost       string `mapstructure:"TT_HOST"`
 	TTUser       string `mapstructure:"TT_USER"`
 	TTPass       string `mapstructure:"TT_PASS"`
+	Fabcoin      string `mapstructure:"FABCOIN"`
 }
 
 var Config *EnvConfig

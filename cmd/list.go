@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"encoding/csv"
 	"fmt"
 	"github.com/interfacerproject/zenflows-bank/config"
 	"github.com/interfacerproject/zenflows-bank/storage"
@@ -9,8 +8,9 @@ import (
 	"github.com/spf13/cobra"
 	"log"
 	"os"
-	"strconv"
 )
+
+var outputFile string
 
 func RequestPerson(id string, za zenflows.Agent, rc chan []string) {
 	person, err := za.GetPerson(id)
@@ -25,12 +25,14 @@ func RequestPerson(id string, za zenflows.Agent, rc chan []string) {
 
 func init() {
 	rootCmd.AddCommand(listCmd)
+	rootCmd.PersistentFlags().StringVar(&outputFile, "output", "list.csv", "output file, supported format are csv and xlsx. Defaults to list.csv")
 }
 
 var listCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List accounts and their token amount",
 	Run: func(cmd *cobra.Command, args []string) {
+		var balancesArray storage.Tokens
 		storage := &storage.TTStorage{}
 		err := storage.Init(config.Config.TTHost, config.Config.TTUser, config.Config.TTPass)
 		if err != nil {
@@ -56,22 +58,9 @@ var listCmd = &cobra.Command{
 			if len(val) > 1 {
 				balances[val[0]].EthereumAddress = val[1]
 			}
+			balancesArray = append(balancesArray, balances[val[0]])
 		}
-		wr := csv.NewWriter(os.Stdout)
-		wr.Write([]string{
-			"ID",
-			"EthereumAddress",
-			"Idea",
-			"Strengths",
-		})
-		for k, v := range balances {
-			wr.Write([]string{
-				k,
-				v.EthereumAddress,
-				strconv.FormatInt(v.Idea, 10),
-				strconv.FormatInt(v.Strengths, 10),
-			})
-		}
-		wr.Flush()
+		balancesArray.Export(outputFile)
+		fmt.Printf("File written correctly to %s\n", outputFile)
 	},
 }
