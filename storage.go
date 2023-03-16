@@ -34,6 +34,7 @@ const MAX_RETRY int = 10
 func (storage *TTStorage) Init(host, user, pass string) error {
 	var err error
 	for done, retry := false, 0; !done; retry++ {
+		log.Println(host)
 		storage.db, err = tarantool.Connect(host, tarantool.Opts{
 			User: user,
 			Pass: pass,
@@ -79,7 +80,7 @@ func (storage *TTStorage) Balances() (map[string]*Token, error) {
 			switch resp.Data[i].([]interface{})[2].(string) {
 			case "idea":
 				balances[id].Idea = balances[id].Idea + n
-			case "strength":
+			case "strengths":
 				balances[id].Strength = balances[id].Strength + n
 			}
 		}

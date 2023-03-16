@@ -74,7 +74,7 @@ func (za *ZenflowsAgent) GetPerson(id string) (*ZenflowsPerson, error) {
 	return &ZenflowsPerson{
 		Id:   result["data"]["person"]["id"],
 		Name: result["data"]["person"]["name"],
-		Note: result["data"]["person"]["note"],
+		EthereumAddress: result["data"]["person"]["ethereumAddress"],
 	}, nil
 }
 
