@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package main
+package storage
 
 import (
 	//"encoding/json"
@@ -81,7 +81,7 @@ func (storage *TTStorage) Balances() (map[string]*Token, error) {
 			case "idea":
 				balances[id].Idea = balances[id].Idea + n
 			case "strengths":
-				balances[id].Strength = balances[id].Strength + n
+				balances[id].Strengths = balances[id].Strengths + n
 			}
 		}
 		offset = offset + limit

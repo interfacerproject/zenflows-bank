@@ -1,4 +1,4 @@
-package main
+package zenflows
 
 import (
 	"bytes"
@@ -7,9 +7,9 @@ import (
 	"errors"
 	"fmt"
 	zenroom "github.com/dyne/Zenroom/bindings/golang/zenroom"
+	"github.com/interfacerproject/zenflows-bank/config"
 	"io"
 	"net/http"
-	"os"
 )
 
 const SIGN = `
@@ -28,12 +28,12 @@ Then print 'hash' as 'hex'
 
 const GQL_PERSON string = "query($id: ID!) {person(id: $id) {id name note ethereumAddress}}"
 
-type ZenflowsAgent struct {
+type Agent struct {
 	Sk          string
 	ZenflowsUrl string
 }
 
-func (za *ZenflowsAgent) signRequest(jsonData []byte) (string, string) {
+func (za *Agent) signRequest(jsonData []byte) (string, string) {
 	data := fmt.Sprintf(`{"gql": "%s"}`, b64.StdEncoding.EncodeToString(jsonData))
 	keys := fmt.Sprintf(`{"keyring": {"eddsa": "%s"}}`, za.Sk)
 	result, success := zenroom.ZencodeExec(SIGN, "", data, keys)
@@ -47,14 +47,14 @@ func (za *ZenflowsAgent) signRequest(jsonData []byte) (string, string) {
 	return "zenflows-sign", resDecoded["eddsa_signature"]
 }
 
-type ZenflowsPerson struct {
-	Id   string
-	Name string
-	Note string
+type Person struct {
+	Id              string
+	Name            string
+	Note            string
 	EthereumAddress string
 }
 
-func (za *ZenflowsAgent) GetPerson(id string) (*ZenflowsPerson, error) {
+func (za *Agent) GetPerson(id string) (*Person, error) {
 	query, err := json.Marshal(map[string]interface{}{
 		"query": GQL_PERSON,
 		"variables": map[string]string{
@@ -69,23 +69,25 @@ func (za *ZenflowsAgent) GetPerson(id string) (*ZenflowsPerson, error) {
 	var result map[string]map[string]map[string]string
 	json.Unmarshal(body, &result)
 	if result["data"]["person"] == nil {
-		return nil, errors.New("Error in the response from zenflows")
+		return nil, errors.New("Empty response from zenflows")
 	}
-	return &ZenflowsPerson{
-		Id:   result["data"]["person"]["id"],
-		Name: result["data"]["person"]["name"],
+	return &Person{
+		Id:              result["data"]["person"]["id"],
+		Name:            result["data"]["person"]["name"],
+		Note:            result["data"]["person"]["note"],
 		EthereumAddress: result["data"]["person"]["ethereumAddress"],
 	}, nil
 }
 
-func (za *ZenflowsAgent) makeRequest(query []byte) ([]byte, error) {
+func (za *Agent) makeRequest(query []byte) ([]byte, error) {
 	r, err := http.NewRequest("POST", za.ZenflowsUrl, bytes.NewReader(query))
 	if err != nil {
 		panic(err)
 	}
 	r.Header.Add("Content-Type", "application/json")
 	r.Header.Add(za.signRequest(query))
-	r.Header.Add("zenflows-user", os.Getenv("ZENFLOWS_USER"))
+	r.Header.Add("zenflows-user", config.Config.ZenflowsUser)
+	// TODO: move it outside
 	client := &http.Client{}
 	res, err := client.Do(r)
 	if err != nil {
@@ -100,4 +102,3 @@ func (za *ZenflowsAgent) makeRequest(query []byte) ([]byte, error) {
 	}
 	return body, nil
 }
-
