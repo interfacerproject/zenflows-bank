@@ -18,6 +18,7 @@ package storage
 
 import (
 	"encoding/csv"
+	"github.com/xuri/excelize/v2"
 	"io"
 	"log"
 	"os"
@@ -124,11 +125,63 @@ func (ts *TokensFile) ImportCSV() {
 	}
 }
 
+func (ts *TokensFile) ImportXLSX() {
+	f, err := excelize.OpenFile(ts.FileName)
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+	defer func() {
+		// Close the spreadsheet.
+		if err := f.Close(); err != nil {
+			log.Fatal(err)
+		}
+	}()
+
+	readCell := func(i, j int) string {
+		cell, err := excelize.CoordinatesToCellName(i, j)
+		if err != nil {
+			panic(err)
+		}
+		val, err := f.GetCellValue("Balances", cell)
+		if err != nil {
+			panic(err)
+		}
+		return val
+	}
+
+	for i := 2; ; i = i + 1 {
+		id := readCell(1, i)
+		if id == "" {
+			break
+		}
+		ethAddr := readCell(2, i)
+		idea, err := strconv.ParseInt(readCell(3, i), 10, 64)
+		if err != nil {
+			log.Fatal(err)
+		}
+		strengths, err := strconv.ParseInt(readCell(4, i), 10, 64)
+		if err != nil {
+			log.Fatal(err)
+		}
+		ts.Tokens = append(ts.Tokens,
+			&Token{
+				Id:              id,
+				EthereumAddress: ethAddr,
+				Idea:            idea,
+				Strengths:       strengths,
+			},
+		)
+	}
+}
+
 func (ts *TokensFile) Import() {
 	ext := filepath.Ext(ts.FileName)
 	switch ext {
 	case ".csv":
 		ts.ImportCSV()
+	case ".xlsx":
+		ts.ImportXLSX()
 	default:
 		panic("Unsupported extension " + ext)
 	}
