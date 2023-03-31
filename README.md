@@ -81,16 +81,54 @@ which builds a the service as the executable named `bank`.
 ## 🎮 Quick start
 Set up the `app.env` file with the required environment variables, one can see and example in `app.env.example`.
 
+```
+## installed instance of the zenflows backend
+ZENFLOWS_URL="https://zenflows-test.interfacer.dyne.org/api"
+
+# a user and SK for the bank on the zenflows backend
+ZENFLOWS_USER=...
+ZENFLOWS_SK=...
+
+## tarantool database where points are stored
+TT_HOST="localhost:3500"
+TT_USER=...
+TT_PASS=...
+# this may require an ssh tunnel in production
+
+# ERC20 address of our coin
+FABCOIN=...
+
+# explorer of the blockchain for the tx broadcast
+ETHEREUM_URL="https://rpc-mumbai.maticvigil.com"
+# secret key of the bank, owner of the coin genesis
+ETHEREUM_SK=...
+```
+
 Once the env vars are set, one can export a summary of the _idea_ and _strengths_ in excel format using
 ```
 bank list --output list.xlsx
 ```
 
-Then, one can distribute fabcoin using
+Then, one can distribute fabcoins using
 ```
 bank airdrop --input list.csv --output txid.xlsx
 ```
-the default rule is "if one has more than 10 _idea_ points and more than 10 _strengths_ points, then he receives 100 _fabcoins_". The specific amount can be changed.
+
+Which will return a list of transaction ids executed on the blockchain and verifiable using an explorer.
+
+Airdrop also takes parameters: quantity to airdrop and minimum thresholds of strength and idea points to be eligible
+```
+Usage:
+  bank airdrop [flags]
+
+Flags:
+      --fabcoinsAmount int   fabcoinsAmount to transfer (default 100)
+  -h, --help                 help for airdrop
+      --minIdea int          minimum amount of idea. Defaults to 10 (default 10)
+      --minStrengths int     minimum amount of strengths. Defaults to 10 (default 10)
+```
+
+the default rule is "if one has more than 10 _idea_ points and more than 10 _strengths_ points, then he receives 100 _fabcoins_". The specific amount can be changed. The minimum threshold is `idea AND strength`, setting one to zero will ignore the value.
 
 **[🔝 back to top](#toc)**
 
@@ -103,7 +141,7 @@ the default rule is "if one has more than 10 _idea_ points and more than 10 _str
 
 Copyleft (ɔ) 2023 by [Dyne.org](https://www.dyne.org) foundation, Amsterdam
 
-Designed, written and maintained by Alberto Lerda
+Designed, written and maintained by Alberto Lerda and Denis Roio
 
 **[🔝 back to top](#toc)**
 
