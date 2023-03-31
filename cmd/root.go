@@ -14,7 +14,7 @@ var outputFile string
 func init() {
 	cobra.OnInitialize(config.Init)
 	rootCmd.PersistentFlags().StringVar(&inputFile, "input", "list.csv", "input file, supported format are csv and xlsx. Defaults to list.csv")
-	rootCmd.PersistentFlags().StringVar(&outputFile, "output", "list.csv", "output file, supported format are csv and xlsx. Defaults to list.csv")
+	rootCmd.PersistentFlags().StringVar(&outputFile, "output", "result.csv", "output file, supported format are csv and xlsx. Defaults to result.csv")
 }
 
 var rootCmd = &cobra.Command{

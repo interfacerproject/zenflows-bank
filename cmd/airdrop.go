@@ -89,7 +89,7 @@ var airdropCmd = &cobra.Command{
 
 		for _, v := range balancesIO.Tokens {
 			var fabcoin int64 = 0
-			if v.Idea > minIdea && v.Strengths > minStrengths {
+			if v.Idea >= minIdea && v.Strengths >= minStrengths {
 				fabcoin = 100
 			}
 
